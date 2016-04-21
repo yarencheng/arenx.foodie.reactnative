@@ -5,8 +5,11 @@ import React, {
     Text,
     View,
     TouchableHighlight,
-    Navigator
+    Navigator,
+    ToastAndroid
 } from 'react-native';
+
+import {GoogleSignin, GoogleSigninButton} from 'react-native-google-signin';
 
 
 
@@ -22,13 +25,45 @@ class Setting extends Component {
                         <Text>{" <-- "}</Text>
                     </TouchableHighlight>
                     <Text style={styles.titleText}>setting</Text>
+
+
+
                 </View>
                 <View style={styles.container}>
                     <Text>settings!</Text>
+                        <GoogleSigninButton
+                            style={{width: 150, height: 48}}
+                            size={GoogleSigninButton.Size.Icon}
+                            color={GoogleSigninButton.Color.Dark}
+                            onPress={this.sign}
+                            />
                 </View>
+
+
+
 
             </View>
         );
+    }
+    sign(){
+        GoogleSignin.configure({
+            scope: ['https://www.googleapis.com/auth/userinfo.email'],
+            //iosClientId: '???', // only for iOS
+            webClientId: '755058913802-g2atj31r9k53k9mnkg8e4qsjppj6vj23.apps.googleusercontent.com',
+            offlineAccess: true
+        });
+
+        GoogleSignin.signIn()
+        .then((user) => {
+            //console.log(user);
+            //this.setState({user: user});
+            ToastAndroid.show('user '+user, ToastAndroid.SHORT);
+        })
+        .catch((err) => {
+            //console.log('WRONG SIGNIN', err);
+            ToastAndroid.show('fail '+err, ToastAndroid.SHORT);
+        })
+        .done();
     }
 }
 
