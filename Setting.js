@@ -8,6 +8,8 @@ import React, {
     Navigator
 } from 'react-native';
 
+
+
 class Setting extends Component {
     render() {
         return(

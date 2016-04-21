@@ -15,8 +15,6 @@ const MeTab = require('./MeTab');
 
 const _navigator_stack= [{id: 'nearby'},{id: 'search'},{id: 'camera'},{id: 'like'},{id: 'me'}];
 
-const appenginr = require('https://apis.google.com/js/client.js?onload=init');
-
 class FoodieApp extends Component {
     _navigator_stack=  [{id: 'nearby'},{id: 'search'},{id: 'camera'},{id: 'like'},{id: 'me'}]
 
