@@ -5,27 +5,31 @@ import React, {
     Text,
     View,
     TouchableHighlight,
-    Navigator
+    Navigator,
+    WebView
 } from 'react-native';
 
 const Setting = require('./Setting');
 
-class MeTab extends Component {
+var MeTab = React.createClass({
     render() {
         return(
             <Navigator
                 ref="navigator"
                 //style={styles.wall}
                 initialRoute={{id: 'main'}}
+                
                 renderScene={this.navigatorRenderScene}/>
 
 
         );
-    }
+    },
     navigatorRenderScene(route, navigator) {
         switch (route.id) {
             case 'setting':
                 return (<Setting navigator={navigator}/>);
+            case 'webview':
+                return (<WebView {...route}/>);
             case 'main':
             default:
                 return (
@@ -49,7 +53,7 @@ class MeTab extends Component {
                 );
         }
     }
-}
+});
 
 const styles = StyleSheet.create({
     all:{

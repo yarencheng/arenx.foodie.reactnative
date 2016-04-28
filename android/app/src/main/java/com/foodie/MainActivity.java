@@ -10,6 +10,8 @@ import java.util.List;
 import co.apptailor.googlesignin.RNGoogleSigninModule;
 import co.apptailor.googlesignin.RNGoogleSigninPackage;
 
+import com.lwansbrough.RCTCamera.*;
+
 public class MainActivity extends ReactActivity {
 
     /**
@@ -38,7 +40,8 @@ public class MainActivity extends ReactActivity {
     protected List<ReactPackage> getPackages() {
         return Arrays.<ReactPackage>asList(
             new RNGoogleSigninPackage(this),
-            new MainReactPackage()
+            new MainReactPackage(),
+            new RCTCameraPackage()
         );
     }
 

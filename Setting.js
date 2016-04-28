@@ -6,14 +6,39 @@ import React, {
     View,
     TouchableHighlight,
     Navigator,
-    ToastAndroid
+    ToastAndroid,
+    ScrollView,
+    TextInput,
+    Linking,
+    WebView
 } from 'react-native';
 
 import {GoogleSignin, GoogleSigninButton} from 'react-native-google-signin';
+import Camera from 'react-native-camera';
 
+var shittyQs = require('shitty-qs')
 
+//const FoodieAPI = require('./FoodieAPI');
 
-class Setting extends Component {
+import {FoodieAPI} from './FoodieAPI';
+
+var Setting = React.createClass({
+
+    getInitialState() {
+        return {
+            user: FoodieAPI.getToken()
+        };
+    },
+
+    componentWillMount (){
+        this.tokenChangeListener = (token)=>this.setState({user: token})
+        FoodieAPI.addTokenListener(this.tokenChangeListener);
+    },
+
+    componentWillUnmount(){
+        FoodieAPI.removeTokenListener(this.tokenChangeListener);
+    },
+
     render() {
         return(
             <View style={styles.all}>
@@ -25,47 +50,50 @@ class Setting extends Component {
                         <Text>{" <-- "}</Text>
                     </TouchableHighlight>
                     <Text style={styles.titleText}>setting</Text>
-
-
-
                 </View>
-                <View style={styles.container}>
+                <ScrollView style={styles.container}>
                     <Text>settings!</Text>
-                        <GoogleSigninButton
-                            style={{width: 150, height: 48}}
-                            size={GoogleSigninButton.Size.Icon}
-                            color={GoogleSigninButton.Color.Dark}
-                            onPress={this.sign}
-                            />
-                </View>
-
-
-
-
+                    <GoogleSigninButton
+                        style={{width: 150, height: 48}}
+                        size={GoogleSigninButton.Size.Icon}
+                        color={GoogleSigninButton.Color.Dark}
+                        onPress={this.sign}
+                        />
+                    <TouchableHighlight
+                        style={{borderWidth: 1}}
+                        //onPress={()=>this.refs.navigator.pop({id: 'me'})}
+                        onPress={()=>FoodieAPI.testHelloworld()}
+                        >
+                        <Text>test api</Text>
+                    </TouchableHighlight>
+                    <TextInput multiline={true} style={{flex:1, height:100}}>{this.state.user}</TextInput>
+                </ScrollView>
             </View>
         );
-    }
+    },
     sign(){
-        GoogleSignin.configure({
-            scope: ['https://www.googleapis.com/auth/userinfo.email'],
-            //iosClientId: '???', // only for iOS
-            webClientId: '755058913802-g2atj31r9k53k9mnkg8e4qsjppj6vj23.apps.googleusercontent.com',
-            offlineAccess: true
+        this.props.navigator.push({
+            source: {uri: 'https://accounts.google.com/o/oauth2/v2/auth?scope=email&response_type=token&redirect_uri=https://net-arenx-foodie.appspot.com/&client_id=755058913802-g2atj31r9k53k9mnkg8e4qsjppj6vj23.apps.googleusercontent.com'},
+            id :'webview',
+            javaScriptEnabled: true,
+            domStorageEnabled: true,
+            decelerationRate: 'normal',
+            automaticallyAdjustContentInsets: false,
+            onNavigationStateChange: (event)=>{
+                // ToastAndroid.show('onNavigationStateChange()', ToastAndroid.SHORT);
+                var query_string = event.url.match(/\#(.*)/);
+                if (!query_string) {
+                      return;
+                }
+                query_string = query_string[0].slice(1);
+                var query = shittyQs(query_string);
+                //this.setState({user: query.access_token});
+                FoodieAPI.setToken(query.access_token);
+                this.props.navigator.pop();
+            }
         });
-
-        GoogleSignin.signIn()
-        .then((user) => {
-            //console.log(user);
-            //this.setState({user: user});
-            ToastAndroid.show('user '+user, ToastAndroid.SHORT);
-        })
-        .catch((err) => {
-            //console.log('WRONG SIGNIN', err);
-            ToastAndroid.show('fail '+err, ToastAndroid.SHORT);
-        })
-        .done();
     }
-}
+});
 
 const styles = StyleSheet.create({
     all:{

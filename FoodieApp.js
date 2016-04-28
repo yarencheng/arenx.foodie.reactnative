@@ -7,73 +7,97 @@ import React, {
     Text,
     View,
     TouchableHighlight,
-    Navigator
+    Navigator,
+    WebView,
+    CameraRoll,
+    ToastAndroid
 } from 'react-native';
+
+import Camera from 'react-native-camera';
 
 const LocationWall = require('./LocationWall');
 const MeTab = require('./MeTab');
+const CameraTab = require('./CameraTab');
 
-const _navigator_stack= [{id: 'nearby'},{id: 'search'},{id: 'camera'},{id: 'like'},{id: 'me'}];
-
-class FoodieApp extends Component {
-    _navigator_stack=  [{id: 'nearby'},{id: 'search'},{id: 'camera'},{id: 'like'},{id: 'me'}]
+var FoodieApp = React.createClass({
+    navigatorStack:  [{id: 'nearby'},{id: 'search'},{id: 'camera'},{id: 'like'},{id: 'me'}],
 
     render() {
         return (
-            <View style={styles.all}>
-
-                <Navigator
-                    ref="navigator"
-                    style={styles.wall}
-                    initialRouteStack={this._navigator_stack}
-                    renderScene={this.navigatorRenderScene}/>
-
-                <View style={styles.toolbar}>
-                    <TouchableHighlight
-                        style={styles.toolbarButton}
-                        onPress={()=>this.refs.navigator.jumpTo(this._navigator_stack[0])}>
-                        <Text>nearby</Text>
-                    </TouchableHighlight>
-                    <TouchableHighlight
-                        style={styles.toolbarButton}
-                        onPress={()=>this.refs.navigator.jumpTo(this._navigator_stack[1])}>
-                        <Text>search</Text>
-                    </TouchableHighlight>
-                    <TouchableHighlight
-                        style={styles.toolbarButton}
-                        onPress={()=>this.refs.navigator.jumpTo(this._navigator_stack[2])}>
-                        <Text>camera</Text>
-                    </TouchableHighlight>
-                    <TouchableHighlight
-                        style={styles.toolbarButton}
-                        //onPress={()=>this.refs.navigator.jumpTo({id: 'like'})}
-                        onPress={()=>this.refs.navigator.jumpTo(this._navigator_stack[3])}
-                        >
-                        <Text>like</Text>
-                    </TouchableHighlight>
-                    <TouchableHighlight
-                        style={styles.toolbarButton}
-                        //onPress={()=>this.refs.navigator.pop({id: 'me'})}
-                        onPress={()=>this.refs.navigator.jumpTo(this._navigator_stack[4])}
-                        >
-                        <Text>me</Text>
-                    </TouchableHighlight>
-                </View>
-            </View>
+            <Navigator
+                ref="navigatorApp"
+                style={styles.all}
+                initialRoute={{id: 'main'}}
+                renderScene={this.navigatorRenderApp}/>
         );
-    }
-    _onPressButton() {
+    },
 
-    }
-    navigatorRenderScene(route, navigator) {
+    navigatorRenderApp(route, navigator) {
+        // ToastAndroid.show('app navigatorRenderScene() ' + navigator.getCurrentRoutes().length + ' '+ JSON.stringify(route), ToastAndroid.SHORT);
+        switch (route.id) {
+            case 'camera':
+                return (<CameraTab
+                    navigator={navigator}
+                    />
+                );
+                //return (<Text>{route.id}</Text>);
+
+            case 'main':
+                return (
+                    <View style={styles.all}>
+                        <Navigator
+                            ref="navigatorTab"
+                            style={styles.wall}
+                            initialRoute={this.navigatorStack[0]}
+                            initialRouteStack={this.navigatorStack}
+                            renderScene={this.navigatorRenderTab}
+                            />
+
+                        <View style={styles.toolbar}>
+                            <TouchableHighlight
+                                style={styles.toolbarButton}
+                                onPress={()=>this.refs.navigatorApp.refs.navigatorTab.jumpTo(this.navigatorStack[0])}>
+                                <Text>nearby</Text>
+                            </TouchableHighlight>
+                            <TouchableHighlight
+                                style={styles.toolbarButton}
+                                onPress={()=>this.refs.navigatorApp.refs.navigatorTab.jumpTo(this.navigatorStack[1])}>
+                                <Text>search</Text>
+                            </TouchableHighlight>
+                            <TouchableHighlight
+                                style={styles.toolbarButton}
+                                onPress={()=>{
+                                    this.refs.navigatorApp.push({id: 'camera'});
+                                }}>
+
+                                <Text>camera</Text>
+                            </TouchableHighlight>
+                            <TouchableHighlight
+                                style={styles.toolbarButton}
+                                onPress={()=>this.refs.navigatorApp.refs.navigatorTab.jumpTo(this.navigatorStack[3])}
+                                >
+                                <Text>like</Text>
+                            </TouchableHighlight>
+                            <TouchableHighlight
+                                style={styles.toolbarButton}
+                                onPress={()=>this.refs.navigatorApp.refs.navigatorTab.jumpTo(this.navigatorStack[4])}
+                                >
+                                <Text>me</Text>
+                            </TouchableHighlight>
+                        </View>
+                    </View>
+                );
+        }
+    },
+    navigatorRenderTab(route, navigator) {
         switch (route.id) {
             case 'me':
                 return (<MeTab navigator={navigator}/>);
             default:
                 return (<Text>{route.id}</Text>);
         }
-    }
-}
+    },
+});
 
 const styles = StyleSheet.create({
     all:{
